@@ -1,7 +1,6 @@
 import streamlit as st  
 import pandas as pd
 import numpy as np
-import math as math
 
 
 DATA_URL = ('Employees.csv')
@@ -10,13 +9,6 @@ st.set_page_config(
     page_title="Multipage App"  
 )
 
-st.title("Filtros")
-st.sidebar.success("Select a page above")
-
-
-
-
-
 @st.cache
 def load_data(nrows):
     #data = pd.read_csv(DATA_URL, nrows=nrows)
@@ -24,7 +16,12 @@ def load_data(nrows):
     return data
 
 
-
+# This is a generic function so that the filtes will work as a 
+# whole search enginee. 
+# i.e. if you search by Employee Id that contains '23' you could 
+# also write with Education Level 1 and it will give the result
+# of 58 employees and if you write as a Hometown "Clinton" it 
+# will give you 6 employee records found.
 @st.cache
 def filter_by_texboxes(data, employeeIdFilter, homeTownFilter, unitFilter, educationalLevlFilter):
     dyn_query = '1==1'
@@ -67,11 +64,23 @@ def createSelectBox(data, column):
 data = load_data(500)
 dataFiltered = ''
 
-# Creating a side bar
-sidebar_obj = st.sidebar
 
-if sidebar_obj.checkbox('Mostrar tabla original'):
-    st.subheader('Mostrando datos')
+st.sidebar.success("Select a page above")
+st.title('Hackaton HackerEarth 2020')
+st.title('Data Science and AI')
+st.markdown('Barush Espinosa, 2022')
+
+st.markdown('**_En esta pantalla podrás hacer tus busquedas, todos los filtros están relacionados._**')
+
+# This program will be divided in 2 parts, one page will work with
+# filters, and the other page will show the graphs
+
+sidebar_obj = st.sidebar
+originalTblChk = sidebar_obj.checkbox('Mostrar datos sin filtro', value=True)
+if originalTblChk:
+    st.subheader('Tabla Empleados ')
+    
+    st.write(f"Total Empleados : {data.shape[0]}")
     st.write(data)
 
 employeeIdFilter = sidebar_obj.text_input("Buscar por EmployeeID")
@@ -89,7 +98,7 @@ sel_cities = sidebar_obj.selectbox("Seleccionar ciudades", sel_cities_df)
 sel_unit = sidebar_obj.selectbox("Seleccionar Unidades", sel_unit_df)
 
 
-btnBuscar = st.sidebar.button('Buscar...')
+btnBuscar = st.sidebar.button('Buscar')
 if(btnBuscar):
     if(sel_educational_levl == ' Todos..'):
         sel_educational_levl = '0'
@@ -109,9 +118,6 @@ if(btnBuscar):
         st.session_state.homeTownFilter = '.'
         st.session_state.unitFilter = '.'
         st.session_state.sel_educational_levl = 0
-        print('No los encuentra(1)..')
-    print('Si los encontró(1)..')
-   
 
     st.session_state.employeeIdFilter = employeeIdFilter
     st.session_state.homeTownFilter = homeTownFilter
@@ -120,5 +126,5 @@ if(btnBuscar):
     
 
     dataFiltered = filter_by_texboxes(data, employeeIdFilter.upper(), homeTownFilter.upper(), unitFilter.upper(), int(sel_educational_levl))
-    st.write(f"Total Empleados : {dataFiltered.shape[0]}")
+    st.write(f"Total empleados encontrados: {dataFiltered.shape[0]} ")
     st.write(dataFiltered)
